@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Celebration Writers: Play and Learn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600;700&family=Lexend:wght@400;500;600&display=swap">
+<style>
+/* Cartoon sticker style: thick navy outlines, hard drop shadows, bright sky background. Mascot: Kiki the mouse-deer. */
+:root{
+  --sky:#bfe8ff; --sky2:#e9f8ff; --ink:#1f2a44; --muted:#4b5a78; --card:#ffffff;
+  --blue:#2563eb; --sun:#ffc933; --red:#ff5d5d; --green:#2fbf71; --purple:#7c5cf0; --orange:#ff9a3c; --pink:#ff7eb6;
+  --good-bg:#d8f7e5; --good:#12804a; --bad-bg:#ffe1e1; --bad:#b32727; --soft:#eef5ff;
+  --display:'Fredoka','Trebuchet MS',sans-serif; --body:'Lexend','Segoe UI',Arial,sans-serif; --scale:1;
+}
+:root[data-easy="1"]{--body:'Atkinson Hyperlegible','Segoe UI',Arial,sans-serif}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;color:var(--ink);font-family:var(--body);font-size:calc(16px*var(--scale));line-height:1.55;min-height:100vh;
+  background:linear-gradient(180deg,var(--sky) 0%,var(--sky2) 70%,#f6fcff 100%) fixed;
+  padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.9;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='300'%3E%3Cg fill='%23fff'%3E%3Cellipse cx='120' cy='70' rx='60' ry='22'/%3E%3Cellipse cx='160' cy='56' rx='40' ry='24'/%3E%3Cellipse cx='560' cy='120' rx='70' ry='24'/%3E%3Cellipse cx='610' cy='102' rx='44' ry='26'/%3E%3Cellipse cx='800' cy='40' rx='50' ry='18'/%3E%3C/g%3E%3C/svg%3E") repeat-x 0 20px/900px 300px}
+body::after{content:"";position:fixed;left:-10%;right:-10%;bottom:-70px;height:130px;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 20% 100%,#8fdc9d 0 48%,transparent 49%),radial-gradient(ellipse at 70% 100%,#6fcf86 0 52%,transparent 53%)}
+#app{position:relative;z-index:1;max-width:1040px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.15;margin:0;text-wrap:balance}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:4px solid #7c5cf0;outline-offset:2px;border-radius:10px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* sticker pieces */
+.card{background:var(--card);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px;min-width:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:8px 20px;border:3px solid var(--ink);border-radius:16px;background:var(--sun);color:var(--ink);font-family:var(--display);font-weight:600;font-size:1.05em;box-shadow:0 5px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.btn.blue{background:var(--blue);color:#fff}
+.btn.white{background:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn:disabled{opacity:.5;cursor:default;box-shadow:0 5px 0 var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.msg{font-weight:600;min-height:1.5em;margin-top:10px}
+.ok{color:var(--good)}.no{color:var(--bad)}
+.intro{color:var(--muted);margin-bottom:12px}
+
+/* header */
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 0}
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:700;font-size:1.3em;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:0 4px 0 var(--ink);padding:4px 14px 4px 8px}
+.logo svg{width:32px;height:32px}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:3px solid var(--ink);border-radius:999px;padding:3px 12px;font-weight:600;font-size:.92em;min-height:40px}
+.chip svg{width:22px;height:22px}
+.dot{width:12px;height:12px;border-radius:50%;background:#9aa7bd;border:2px solid var(--ink);flex:none}
+.dot.sent{background:var(--green)}.dot.wait{background:var(--orange)}.dot.err{background:var(--red)}
+.gear{width:46px;height:46px;border:3px solid var(--ink);border-radius:50%;background:#fff;box-shadow:0 4px 0 var(--ink);display:grid;place-items:center;padding:0}
+.gear svg{width:26px;height:26px}
+
+/* mascot */
+.coach{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+.kiki{width:92px;flex:none}
+.kiki svg{width:100%;height:auto;display:block}
+.bubble{position:relative;background:#fff;border:3px solid var(--ink);border-radius:20px;padding:10px 16px;font-weight:500;flex:1;min-width:0}
+.bubble::before{content:"";position:absolute;left:-14px;top:50%;margin-top:-8px;border:8px solid transparent;border-right:12px solid var(--ink);border-left:0}
+.bubble::after{content:"";position:absolute;left:-9px;top:50%;margin-top:-6px;border:6px solid transparent;border-right:9px solid #fff;border-left:0}
+
+/* welcome */
+.welcome{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));align-items:start;padding-top:8px}
+.welcome h1{font-size:2.3em}
+.field{display:grid;gap:4px;margin-top:12px}
+.field label{font-weight:600}
+input[type=text],textarea,select{width:100%;border:3px solid var(--ink);border-radius:14px;padding:10px 12px;background:#fff;min-height:48px}
+textarea{line-height:1.7;min-height:230px;resize:vertical}
+.lvls{display:grid;gap:8px;margin-top:6px}
+.lvl{display:flex;gap:10px;align-items:center;text-align:left;border:3px solid var(--ink);border-radius:14px;background:#fff;padding:8px 12px;min-height:56px;width:100%}
+.lvl b{font-family:var(--display);white-space:nowrap}
+.lvl small{color:var(--muted);line-height:1.3;display:block}
+.lvl[aria-pressed="true"]{background:var(--sun)}
+.lvl[aria-pressed="true"] small{color:var(--ink)}
+.stars{color:#e8a600;letter-spacing:1px;white-space:nowrap}
+.notice{font-size:.88em;color:var(--muted);margin-top:12px}
+
+/* map */
+.maphd{display:flex;justify-content:space-between;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:14px}
+.maphd h2{font-size:1.9em}
+.map{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))}
+.gcard{display:grid;gap:6px;text-align:left;background:#fff;border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:14px;width:100%;transition:transform .08s,box-shadow .08s}
+.gcard:active{transform:translateY(5px);box-shadow:0 1px 0 var(--ink)}
+.gcard .ic{width:76px;height:76px;border:3px solid var(--ink);border-radius:20px;display:grid;place-items:center}
+.gcard .ic svg{width:58px;height:58px}
+.gcard h3{font-size:1.25em}
+.gcard .tag{font-size:.78em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.gcard .best{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:2px;font-size:.92em;color:var(--muted)}
+.gcard .stars{font-size:1.2em}
+
+/* game */
+.gtop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.gtop h2{font-size:1.6em;flex:1;min-width:160px}
+.stage{min-width:0}
+.pool{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tile{min-height:48px;padding:6px 14px;border:3px solid var(--ink);border-radius:14px;background:#fff;font-weight:500;box-shadow:0 3px 0 var(--ink)}
+.tile:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.tile.sel{background:var(--sun)}
+.tile.lock{background:#dbe8fb}
+.tile.fixd{background:var(--good-bg);color:var(--good);font-weight:700}
+.tile:disabled{cursor:default}
+.item{border:3px dashed #9db2d3;border-radius:16px;padding:12px;background:var(--soft)}
+.item+.item{margin-top:12px}
+
+/* memory */
+.mem{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));max-width:660px}
+.mcard{aspect-ratio:1/1;border:3px solid var(--ink);border-radius:18px;box-shadow:0 4px 0 var(--ink);background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;font-family:var(--display);font-size:2.2em;display:grid;place-items:center;padding:6px;text-align:center;line-height:1.1}
+.mcard.face{background:#fff;color:var(--ink);font-size:1.02em;font-weight:600}
+.mcard.match{background:var(--good-bg);color:var(--good)}
+.mcard .pic{width:100%;height:100%;border-radius:12px;display:grid;place-items:center;border:2px solid var(--ink)}
+.mcard .pic svg{width:70%;height:70%}
+
+/* baskets */
+.baskets{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));margin-top:16px}
+.basket{border:3px solid var(--ink);border-radius:8px 8px 26px 26px;background:#ffe9bf;padding:10px;text-align:left;min-height:130px;display:block;width:100%;box-shadow:0 4px 0 var(--ink)}
+.basket .hd{display:flex;gap:8px;align-items:center;font-family:var(--display);font-weight:600}
+.basket .hd span.ic{width:38px;height:38px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;flex:none}
+.basket .hd svg{width:24px;height:24px}
+.basket.hot{background:#fff3b0}
+.basket .in{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.basket .in i{font-style:normal;background:#fff;border:2px solid var(--ink);border-radius:10px;padding:1px 8px;font-size:.9em;font-weight:600}
+
+/* hunt */
+.hunt{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));align-items:start}
+.hgrid{display:grid;gap:3px;grid-template-columns:repeat(9,minmax(0,1fr));width:min(100%,440px)}
+.hc{aspect-ratio:1/1;border:2px solid var(--ink);border-radius:8px;background:#fff;font-family:var(--display);font-weight:600;font-size:1.1em;padding:0;min-width:0}
+.hc.sel{background:var(--sun)}
+.hc.found{background:var(--green);color:#fff}
+.hwords{display:flex;gap:8px;flex-wrap:wrap;padding:0;margin:8px 0 0}
+.hwords li{list-style:none;border:3px solid var(--ink);border-radius:12px;padding:3px 12px;font-weight:600;background:#fff}
+.hwords li.f{background:var(--good-bg);color:var(--good);text-decoration:line-through}
+.hwords.clue li{font-weight:500}.hwords.clue li.f{text-decoration:none}
+
+/* train */
+.wag{position:relative;margin-bottom:12px}
+.zone{min-height:62px;display:flex;flex-wrap:wrap;gap:8px;padding:8px 8px 12px;border-bottom:6px solid #8a5a2b;align-items:center}
+.zone .tile{background:var(--blue);color:#fff;position:relative}
+.zone .tile.lock{background:#dbe8fb;color:var(--ink)}
+.zone:empty::before{content:"Tap words to fill the train";color:var(--muted);font-size:.9em}
+
+/* spot */
+.tok{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.tok .tile{font-size:1.1em}
+
+/* spinner */
+.reels{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));margin:10px 0}
+.reel{border:3px solid var(--ink);border-radius:18px;background:#fff;box-shadow:0 4px 0 var(--ink);padding:10px;text-align:center;min-height:116px;display:grid;align-content:center;gap:6px}
+.reel .l{font-size:.78em;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.reel .v{font-family:var(--display);font-size:1.4em;font-weight:600}
+.reel .ico{width:48px;height:48px;border-radius:50%;margin:0 auto;display:grid;place-items:center;border:2px solid var(--ink)}
+.reel .ico svg{width:30px;height:30px}
+.checks{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px}
+.checks li{display:flex;gap:8px;align-items:center}
+.checks li::before{content:"";flex:none;width:22px;height:22px;border-radius:50%;border:3px solid var(--ink);background:#fff}
+.checks li.ok::before{background:var(--green);content:"\2713";color:#fff;text-align:center;line-height:16px;font-weight:700;font-size:.85em}
+
+/* writing */
+.write{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));align-items:start}
+.bank h3{font-size:.95em;margin:12px 0 6px;font-family:var(--body);color:var(--muted);font-weight:600}
+.bank .bs{display:flex;gap:6px;flex-wrap:wrap}
+.bank .bs button{padding:3px 12px;min-height:40px;border-radius:999px;border:3px solid var(--ink);background:#fff;font-weight:500}
+.meter{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.92em;margin-top:6px}
+
+/* balloons */
+.qline{font-family:var(--display);font-size:1.5em;font-weight:600;margin:6px 0 4px;line-height:1.3}
+.blank{display:inline-block;min-width:3em;border-bottom:4px solid var(--blue);color:var(--blue);text-align:center}
+.balloons{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;padding:26px 6px 34px}
+.bal{position:relative;width:104px;height:124px;border:3px solid var(--ink);border-radius:50% 50% 48% 48%/55% 55% 45% 45%;color:#fff;font-family:var(--display);font-weight:600;font-size:1.15em;line-height:1.1;padding:6px;display:grid;place-items:center;animation:bob 2.6s ease-in-out infinite;box-shadow:inset -10px -10px 0 rgba(0,0,0,.12)}
+.bal:nth-child(2n){animation-delay:-.9s}.bal:nth-child(3n){animation-delay:-1.7s}
+.bal::after{content:"";position:absolute;left:50%;bottom:-16px;width:3px;height:16px;background:var(--ink);margin-left:-1px}
+.bal.dark{color:var(--ink)}
+.bal.gone{visibility:hidden}
+.bal.shake{animation:shake .4s;background:#b9c2d3!important;color:#5b6784}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.rounds{display:flex;gap:6px;margin-bottom:6px}
+.rounds i{width:16px;height:16px;border-radius:50%;border:3px solid var(--ink);background:#fff}
+.rounds i.d{background:var(--green)}.rounds i.c{background:var(--sun)}
+
+/* modal */
+.ov{position:fixed;inset:0;z-index:50;background:rgba(31,42,68,.55);display:none;align-items:center;justify-content:center;padding:16px}
+.ov.on{display:flex}
+.dlg{background:#fff;border:3px solid var(--ink);border-radius:24px;box-shadow:0 8px 0 var(--ink);padding:20px;width:min(100%,560px);max-height:calc(100vh - 32px);overflow:auto}
+.dlg h2{font-size:1.6em}
+.big{font-size:3em;color:#e8a600;letter-spacing:6px;line-height:1;text-align:center}
+.pop{display:inline-block;animation:pop .5s both}
+@keyframes pop{0%{transform:scale(.2) rotate(-20deg);opacity:0}70%{transform:scale(1.25) rotate(6deg)}100%{transform:scale(1);opacity:1}}
+.sync{display:flex;gap:8px;align-items:center;justify-content:center;font-weight:600;margin-top:10px}
+.setrow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-top:2px solid #dde6f3}
+.setrow:first-of-type{border-top:0}
+.tt{background:var(--soft);border:3px solid var(--ink);border-radius:14px;padding:12px;margin-top:12px;font-size:.92em}
+.tt code{background:#fff;border:1px solid #c5d3ea;border-radius:6px;padding:0 4px;overflow-wrap:anywhere}
+#confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:70}
+#confetti i{position:absolute;top:-16px;width:10px;height:16px;border-radius:3px;animation:fall 2.6s ease-in forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(720deg)}}
+.hide{display:none!important}
+body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media (max-width:520px){.kiki{width:72px}.welcome h1{font-size:1.9em}.logo{font-size:1.1em}.bal{width:92px;height:112px}}
+</style>
+</head>
+<body>
+<div id="app">
+ <header class="hdr">
+  <div class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4L60 32L32 60L4 32Z" fill="#ffc933" stroke="#1f2a44" stroke-width="4" stroke-linejoin="round"/><path d="M32 4V60M4 32H60" stroke="#1f2a44" stroke-width="3"/></svg>Celebration Writers</div>
+  <div class="chips" id="hdrChips" hidden>
+   <span class="chip" id="scoreChip" aria-live="polite"></span>
+   <span class="chip" id="syncChip"><i class="dot" id="syncDot"></i><span id="syncTxt"></span></span>
+   <button class="gear" id="gearBtn" aria-label="Settings"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="5" fill="none" stroke="#1f2a44" stroke-width="3"/><path d="M16 3v5M16 24v5M3 16h5M24 16h5M7 7l3.5 3.5M21.5 21.5L25 25M7 25l3.5-3.5M21.5 10.5L25 7" stroke="#1f2a44" stroke-width="3" stroke-linecap="round"/></svg></button>
+  </div>
+ </header>
+ <main id="main"></main>
+</div>
+<div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="dlgTitle"><div class="dlg" id="dlg"></div></div>
+<div id="confetti" aria-hidden="true"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ====================================================================
+   TEACHER SETTINGS  (edit these two lines after you deploy Code.gs)
+   ==================================================================== */
+var CONFIG={
+  SHEET_URL:"https://script.google.com/macros/s/AKfycbxM8KEBISMYg3SSkUB7A9uiW5gmoX3DxtRWWWaDVHUCJBL0Io9IOeFpMNeupcJmQu66/exec",     /* paste your Google Apps Script Web app URL here (ends with /exec) */
+  TOKEN:"matcha25" /* must be the same secret word as TOKEN in Code.gs */
+};
+
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+
+/* ---------- safe storage ---------- */
+var mem={};
+function load(k,def){try{var v=localStorage.getItem("cw_"+k);if(v!==null)return JSON.parse(v)}catch(e){}return mem[k]!==undefined?mem[k]:def}
+function save(k,v){mem[k]=v;try{localStorage.setItem("cw_"+k,JSON.stringify(v))}catch(e){}}
+
+/* ---------- state ---------- */
+var P=load("profile",null);                 /* {name, cls, level} */
+var BEST=load("best",{});                   /* game -> {pts, stars} */
+var QUEUE=load("queue",[]);                 /* unsent records */
+var HIST=load("hist",[]);                   /* all records on this device */
+var SET=load("settings",{sound:true,calm:false,easy:false,scale:1,url:"",token:""});
+var DEVICE=load("device",null);if(!DEVICE){DEVICE="d"+Math.random().toString(36).slice(2,8);save("device",DEVICE)}
+function lv(a){return a[(P?P.level:1)-1]}
+function stars(n){return "★".repeat(n)+"☆".repeat(3-n)}
+function starsFor(p){return p>=80?3:p>=50?2:1}
+
+/* ---------- content ---------- */
+var ICON={
+ ketupat:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5L59 32L32 59L5 32Z" fill="#fff" stroke="#1f2a44" stroke-width="3" stroke-linejoin="round"/><path d="M32 5V59M5 32H59M17 18L47 46M47 18L17 46" stroke="#1f9d6a" stroke-width="3" fill="none"/></svg>',
+ lantern:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 2V10" stroke="#1f2a44" stroke-width="3"/><rect x="22" y="9" width="20" height="6" rx="2" fill="#ffc933" stroke="#1f2a44" stroke-width="2.5"/><ellipse cx="32" cy="32" rx="22" ry="17" fill="#ff5d5d" stroke="#1f2a44" stroke-width="3"/><path d="M32 15V49M20 17C14 28 14 36 20 47M44 17C50 28 50 36 44 47" stroke="#1f2a44" stroke-width="2" fill="none"/><rect x="22" y="48" width="20" height="6" rx="2" fill="#ffc933" stroke="#1f2a44" stroke-width="2.5"/><path d="M32 54V62" stroke="#1f2a44" stroke-width="3"/></svg>',
+ diya:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3C45 20 43 31 32 39C21 31 19 20 32 3Z" fill="#ff9a3c" stroke="#1f2a44" stroke-width="3" stroke-linejoin="round"/><path d="M32 17C37 25 36 30 32 34C28 30 27 25 32 17Z" fill="#ffe27a"/><path d="M6 40H58C56 54 46 60 32 60C18 60 8 54 6 40Z" fill="#fff" stroke="#1f2a44" stroke-width="3" stroke-linejoin="round"/><path d="M14 48H50" stroke="#ff9a3c" stroke-width="3"/></svg>',
+ tree:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 18L50 38H14Z" fill="#2fbf71" stroke="#1f2a44" stroke-width="3" stroke-linejoin="round"/><path d="M32 30L56 54H8Z" fill="#2fbf71" stroke="#1f2a44" stroke-width="3" stroke-linejoin="round"/><rect x="27" y="54" width="10" height="8" fill="#a8672f" stroke="#1f2a44" stroke-width="2.5"/><path d="M32 2L36 11L45 12L38 18L41 27L32 22L23 27L26 18L19 12L28 11Z" fill="#ffc933" stroke="#1f2a44" stroke-width="2.5" stroke-linejoin="round"/><circle cx="26" cy="46" r="3.5" fill="#ff5d5d" stroke="#1f2a44" stroke-width="2"/><circle cx="40" cy="48" r="3.5" fill="#ffc933" stroke="#1f2a44" stroke-width="2"/></svg>',
+ rice:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M30 62C30 40 28 24 18 8" stroke="#1f2a44" stroke-width="3.5" fill="none" stroke-linecap="round"/><g fill="#ffc933" stroke="#1f2a44" stroke-width="2.5"><ellipse cx="20" cy="12" rx="4.5" ry="8" transform="rotate(-20 20 12)"/><ellipse cx="28" cy="20" rx="4.5" ry="8" transform="rotate(25 28 20)"/><ellipse cx="16" cy="24" rx="4.5" ry="8" transform="rotate(-35 16 24)"/><ellipse cx="29" cy="34" rx="4.5" ry="8" transform="rotate(30 29 34)"/><ellipse cx="20" cy="38" rx="4.5" ry="8" transform="rotate(-30 20 38)"/></g><path d="M30 62C36 48 44 38 56 34" stroke="#1f2a44" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>'
+};
+var DATA=[
+ {id:"raya",name:"Hari Raya Aidilfitri",short:"Hari Raya",col:"#2fbf71",ic:"ketupat",when:"at the end of Ramadan",first:"visit our grandparents",wear:"baju kurung and baju Melayu",eat:"ketupat and rendang",last:"ask for forgiveness",feel:"happy and thankful"},
+ {id:"cny",name:"Chinese New Year",short:"Chinese New Year",col:"#ff7a7a",ic:"lantern",when:"in January or February",first:"clean our house",wear:"new red clothes",eat:"mandarin oranges and yee sang",last:"give ang pao to the children",feel:"excited"},
+ {id:"deep",name:"Deepavali",short:"Deepavali",col:"#ffb04d",ic:"diya",when:"in October or November",first:"light oil lamps",wear:"colourful clothes",eat:"murukku and sweets",last:"decorate the floor with kolam",feel:"joyful"},
+ {id:"xmas",name:"Christmas",short:"Christmas",col:"#6fb0ff",ic:"tree",when:"on 25th December",first:"decorate the Christmas tree",wear:"red and green clothes",eat:"roast chicken and cookies",last:"open presents with our family",feel:"cheerful"},
+ {id:"kaam",name:"Pesta Kaamatan",short:"Pesta Kaamatan",col:"#b79cff",ic:"rice",when:"at the end of May",first:"thank the rice spirit",wear:"colourful traditional costumes",eat:"hinava and sticky rice",last:"enjoy traditional dances",feel:"proud"}
+];
+function dById(id){return DATA.filter(function(d){return d.id===id})[0]}
+var GICON={
+ memory:'<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="14" width="28" height="38" rx="6" fill="#7c5cf0" stroke="#1f2a44" stroke-width="3" transform="rotate(-10 20 33)"/><rect x="30" y="12" width="28" height="38" rx="6" fill="#fff" stroke="#1f2a44" stroke-width="3" transform="rotate(8 44 31)"/><path d="M44 22l3 7 7 1-5 5 1 7-6-4-6 4 1-7-5-5 7-1z" fill="#ffc933" stroke="#1f2a44" stroke-width="2" stroke-linejoin="round" transform="translate(-2 -2)"/></svg>',
+ baskets:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 30H54L48 56H16Z" fill="#ffb04d" stroke="#1f2a44" stroke-width="3" stroke-linejoin="round"/><path d="M20 30C20 8 44 8 44 30" fill="none" stroke="#1f2a44" stroke-width="3"/><path d="M22 38V50M32 38V50M42 38V50" stroke="#1f2a44" stroke-width="2.5"/><circle cx="26" cy="20" r="6" fill="#ff5d5d" stroke="#1f2a44" stroke-width="2.5"/></svg>',
+ hunt:'<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="27" cy="27" r="17" fill="#e5f3ff" stroke="#1f2a44" stroke-width="4"/><path d="M39 39L56 56" stroke="#1f2a44" stroke-width="7" stroke-linecap="round"/><path d="M39 39L56 56" stroke="#ffc933" stroke-width="3" stroke-linecap="round"/><text x="27" y="34" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="20" fill="#2563eb">Aa</text></svg>',
+ train:'<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="22" width="30" height="24" rx="5" fill="#2563eb" stroke="#1f2a44" stroke-width="3"/><rect x="34" y="14" width="24" height="32" rx="5" fill="#ff5d5d" stroke="#1f2a44" stroke-width="3"/><rect x="40" y="20" width="12" height="10" rx="2" fill="#e5f3ff" stroke="#1f2a44" stroke-width="2"/><circle cx="16" cy="50" r="6" fill="#ffc933" stroke="#1f2a44" stroke-width="3"/><circle cx="46" cy="50" r="6" fill="#ffc933" stroke="#1f2a44" stroke-width="3"/><path d="M42 8c0-4 4-4 4-8" stroke="#1f2a44" stroke-width="3" fill="none"/></svg>',
+ spot:'<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="27" cy="27" r="17" fill="#fff" stroke="#1f2a44" stroke-width="4"/><path d="M39 39L56 56" stroke="#1f2a44" stroke-width="7" stroke-linecap="round"/><path d="M39 39L56 56" stroke="#ff5d5d" stroke-width="3" stroke-linecap="round"/><path d="M27 17V30" stroke="#ff5d5d" stroke-width="5" stroke-linecap="round"/><circle cx="27" cy="38" r="3" fill="#ff5d5d"/></svg>',
+ spin:'<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="#fff" stroke="#1f2a44" stroke-width="3.5"/><path d="M32 32L32 6A26 26 0 0 1 54.5 19Z" fill="#ff5d5d"/><path d="M32 32L54.5 19A26 26 0 0 1 54.5 45Z" fill="#ffc933"/><path d="M32 32L54.5 45A26 26 0 0 1 32 58Z" fill="#2fbf71"/><path d="M32 32L32 58A26 26 0 0 1 9.5 45Z" fill="#2563eb"/><path d="M32 32L9.5 45A26 26 0 0 1 9.5 19Z" fill="#7c5cf0"/><path d="M32 32L9.5 19A26 26 0 0 1 32 6Z" fill="#ff9a3c"/><circle cx="32" cy="32" r="26" fill="none" stroke="#1f2a44" stroke-width="3.5"/><circle cx="32" cy="32" r="6" fill="#fff" stroke="#1f2a44" stroke-width="3"/><path d="M32 2L38 12H26Z" fill="#1f2a44"/></svg>',
+ write:'<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="8" width="38" height="48" rx="5" fill="#fff" stroke="#1f2a44" stroke-width="3"/><path d="M15 20H39M15 29H39M15 38H30" stroke="#9db2d3" stroke-width="3" stroke-linecap="round"/><path d="M58 14L30 42L26 54L38 50L62 20Z" fill="#ffc933" stroke="#1f2a44" stroke-width="3" stroke-linejoin="round"/><path d="M26 54L30 42L38 50Z" fill="#ffe0b0" stroke="#1f2a44" stroke-width="2.5" stroke-linejoin="round"/></svg>',
+ balloon:'<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="22" cy="24" rx="16" ry="19" fill="#ff5d5d" stroke="#1f2a44" stroke-width="3"/><path d="M22 43L18 49H26Z" fill="#ff5d5d" stroke="#1f2a44" stroke-width="2.5" stroke-linejoin="round"/><path d="M22 49C22 56 30 56 30 62" stroke="#1f2a44" stroke-width="2.5" fill="none"/><ellipse cx="46" cy="22" rx="12" ry="15" fill="#ffc933" stroke="#1f2a44" stroke-width="3"/><path d="M46 37L42 42H50Z" fill="#ffc933" stroke="#1f2a44" stroke-width="2.5" stroke-linejoin="round"/><path d="M46 42C46 50 40 52 40 60" stroke="#1f2a44" stroke-width="2.5" fill="none"/><path d="M13 14C15 10 18 9 21 9" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/></svg>'
+};
+var GAMES=[
+ {k:"memory",t:"Memory Match",tag:"Memory",col:"#d9ccff",d:"Flip cards and match pictures to names."},
+ {k:"baskets",t:"Festival Baskets",tag:"Sorting",col:"#ffd79a",d:"Put things in the right celebration basket."},
+ {k:"hunt",t:"Word Hunt",tag:"Puzzle",col:"#c9ecff",d:"Find hidden celebration words."},
+ {k:"train",t:"Sentence Train",tag:"Building",col:"#ffc2c2",d:"Build sentences word by word."},
+ {k:"spot",t:"Mistake Detective",tag:"Detective",col:"#ffe7a1",d:"Find the mistake in each sentence."},
+ {k:"balloon",t:"Balloon Pop",tag:"Grammar",col:"#ffc2dd",d:"Pop the balloon with the right word."},
+ {k:"spin",t:"Story Spinner",tag:"Speaking + writing",col:"#bdf0d3",d:"Spin, say it, then write your sentence."},
+ {k:"write",t:"Writing Studio",tag:"Writing",col:"#c9d9ff",d:"Write your own paragraph with a checklist."}
+];
+function gm(k){return GAMES.filter(function(g){return g.k===k})[0]}
+var LVL=[{n:1,t:"Star level 1",d:"I want lots of help."},{n:2,t:"Star level 2",d:"I want some help."},{n:3,t:"Star level 3",d:"Give me a challenge!"}];
+
+/* ---------- Kiki the mouse-deer (original mascot) ---------- */
+function kikiSvg(mood){
+ var mouth=mood==="oops"?'<path d="M50 88Q60 80 70 88" fill="none" stroke="#3a2616" stroke-width="3" stroke-linecap="round"/>':mood==="think"?'<path d="M53 86H67" stroke="#3a2616" stroke-width="3" stroke-linecap="round"/>':'<path d="M50 84Q60 94 70 84" fill="#ff8f8f" stroke="#3a2616" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
+ var brow=mood==="oops"?'<path d="M38 46L50 50M82 46L70 50" stroke="#3a2616" stroke-width="3" stroke-linecap="round"/>':"";
+ var star=mood==="cheer"?'<path d="M100 14l3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z" fill="#ffc933" stroke="#1f2a44" stroke-width="2" stroke-linejoin="round"/><path d="M18 20l2 5 6 1-4 4 1 6-5-3-5 3 1-6-4-4 6-1z" fill="#ffc933" stroke="#1f2a44" stroke-width="2" stroke-linejoin="round"/>':"";
+ return '<svg viewBox="0 0 120 120" role="img" aria-label="Kiki the mouse-deer"><ellipse cx="32" cy="34" rx="13" ry="22" transform="rotate(-22 32 34)" fill="#c98a4b" stroke="#3a2616" stroke-width="3"/><ellipse cx="32" cy="36" rx="6" ry="14" transform="rotate(-22 32 36)" fill="#ffb3c7"/><ellipse cx="88" cy="34" rx="13" ry="22" transform="rotate(22 88 34)" fill="#c98a4b" stroke="#3a2616" stroke-width="3"/><ellipse cx="88" cy="36" rx="6" ry="14" transform="rotate(22 88 36)" fill="#ffb3c7"/><ellipse cx="60" cy="66" rx="36" ry="32" fill="#d99a5b" stroke="#3a2616" stroke-width="3"/><circle cx="52" cy="38" r="2.6" fill="#fff3df"/><circle cx="60" cy="34" r="2.6" fill="#fff3df"/><circle cx="68" cy="38" r="2.6" fill="#fff3df"/><ellipse cx="60" cy="82" rx="19" ry="14" fill="#fff3df" stroke="#3a2616" stroke-width="3"/><ellipse cx="60" cy="74" rx="6" ry="4.2" fill="#3a2616"/><circle cx="45" cy="60" r="9" fill="#fff" stroke="#3a2616" stroke-width="3"/><circle cx="75" cy="60" r="9" fill="#fff" stroke="#3a2616" stroke-width="3"/><circle cx="46" cy="61" r="4.5" fill="#3a2616"/><circle cx="74" cy="61" r="4.5" fill="#3a2616"/><circle cx="47.5" cy="59" r="1.7" fill="#fff"/><circle cx="75.5" cy="59" r="1.7" fill="#fff"/><circle cx="31" cy="76" r="5" fill="#ff9db8" opacity=".7"/><circle cx="89" cy="76" r="5" fill="#ff9db8" opacity=".7"/>'+brow+mouth+star+'</svg>';
+}
+function kiki(msg,mood){var k=$("#kiki"),b=$("#bubble");if(k)k.innerHTML=kikiSvg(mood||"happy");if(b)b.textContent=msg}
+var CHEER=["Amazing! Great job!","Well done!","Super!","Yes! You got it!","Fantastic!"],TRY=["Oops! Try again.","Not quite. Look carefully.","Almost! Try another one.","Think again. You can do it!"];
+
+/* ---------- sound & confetti ---------- */
+var AC=null;
+function tone(f,d,t,type){if(!SET.sound)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime+t;o.type=type||"sine";o.frequency.value=f;g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.16,n+.02);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+d+.05)}catch(e){}}
+function sfx(k){if(k==="ok"){tone(660,.12,0);tone(880,.16,.1)}else if(k==="no"){tone(210,.22,0,"triangle")}else if(k==="win"){[523,659,784,1047].forEach(function(f,i){tone(f,.2,i*.12)})}else if(k==="tap"){tone(520,.05,0)}}
+function confetti(){
+ if(SET.calm||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))return;
+ var c=$("#confetti"),cols=["#ff5d5d","#ffc933","#2fbf71","#2563eb","#7c5cf0","#ff7eb6"];c.innerHTML="";
+ for(var i=0;i<44;i++){var s=document.createElement("i");s.style.left=Math.random()*100+"%";s.style.background=cols[i%cols.length];s.style.animationDelay=(Math.random()*.7)+"s";s.style.setProperty("--dx",(Math.random()*160-80)+"px");c.appendChild(s)}
+ setTimeout(function(){c.innerHTML=""},3600);
+}
+
+/* ---------- speech (optional) ---------- */
+function say(t){try{if(!("speechSynthesis" in window))return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang="en-GB";u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
+
+/* ---------- settings applied ---------- */
+function applySettings(){
+ document.documentElement.style.setProperty("--scale",SET.scale);
+ if(SET.easy)document.documentElement.setAttribute("data-easy","1");else document.documentElement.removeAttribute("data-easy");
+ document.body.classList.toggle("calm",!!SET.calm);
+}
+
+/* =====================================================================
+   SCORE RECORDING AND GOOGLE SHEETS SYNC
+   ===================================================================== */
+function sheetUrl(){return CONFIG.SHEET_URL||SET.url||""}
+function sheetToken(){return CONFIG.SHEET_URL?CONFIG.TOKEN:(SET.token||CONFIG.TOKEN)}
+var syncState={s:"idle",busy:false,timer:null};
+function totalPoints(){var t=0;Object.keys(BEST).forEach(function(k){t+=BEST[k].pts});return t}
+function drawHeader(){
+ $("#hdrChips").hidden=!P;
+ if(!P)return;
+ $("#scoreChip").innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 7 7 .6-5.3 4.7 1.7 7.2L12 17.8 5.6 21.5l1.7-7.2L2 9.6 9 9z" fill="#ffc933" stroke="#1f2a44" stroke-width="2" stroke-linejoin="round"/></svg>'+totalPoints()+' points';
+ var d=$("#syncDot"),t=$("#syncTxt"),n=QUEUE.length;
+ d.className="dot";
+ if(!sheetUrl()){t.textContent="Saved on this device";}
+ else if(syncState.s==="sending"){d.classList.add("wait");t.textContent="Sending...";}
+ else if(syncState.s==="error"){d.classList.add("err");t.textContent="Cannot save ("+n+" waiting)";}
+ else if(n>0){d.classList.add("wait");t.textContent=n+" waiting to send";}
+ else{d.classList.add("sent");t.textContent="Saved for teacher";}
+}
+function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function recordScore(game,o){
+ var best=BEST[game];
+ var rec={id:newId(),student:P.name,cls:P.cls,level:P.level,game:game,points:o.pts,stars:starsFor(o.pts),mistakes:o.mistakes||0,seconds:o.seconds||0,writing:(o.text||"").slice(0,1500),device:DEVICE,clientTime:new Date().toISOString()};
+ if(!best||o.pts>=best.pts)BEST[game]={pts:o.pts,stars:rec.stars};
+ save("best",BEST);
+ HIST.push(rec);if(HIST.length>300)HIST=HIST.slice(-300);save("hist",HIST);
+ QUEUE.push(rec);save("queue",QUEUE);
+ drawHeader();
+ flush();
+ return rec;
+}
+function postRec(rec){
+ var url=sheetUrl(),body=JSON.stringify(Object.assign({token:sheetToken()},rec)),hd={"Content-Type":"text/plain;charset=utf-8"};
+ return fetch(url,{method:"POST",headers:hd,body:body,redirect:"follow"}).then(function(r){return r.json()}).then(function(j){
+  if(!j||!j.ok){var e=new Error(j&&j.error||"rejected");e.fatal=true;throw e}return true;
+ },function(){
+  /* the browser may block reading the reply; send once more without reading it (the sheet ignores duplicates) */
+  return fetch(url,{method:"POST",mode:"no-cors",headers:hd,body:body}).then(function(){return true});
+ });
+}
+function flush(){
+ if(syncState.busy||!sheetUrl()||!QUEUE.length){drawHeader();paintSyncLines();return}
+ syncState.busy=true;syncState.s="sending";drawHeader();paintSyncLines();
+ (function next(){
+  if(!QUEUE.length){syncState.busy=false;syncState.s="idle";drawHeader();paintSyncLines();return}
+  postRec(QUEUE[0]).then(function(){QUEUE.shift();save("queue",QUEUE);next()}).catch(function(err){
+   syncState.busy=false;syncState.s="error";syncState.err=err&&err.message;drawHeader();paintSyncLines();
+   clearTimeout(syncState.timer);if(!(err&&err.fatal))syncState.timer=setTimeout(flush,30000);
+  });
+ })();
+}
+window.addEventListener("online",flush);
+function syncLine(){
+ if(!sheetUrl())return {c:"",t:"Your score is saved on this device."};
+ if(syncState.s==="sending")return {c:"wait",t:"Sending your score to your teacher..."};
+ if(syncState.s==="error")return {c:"err",t:syncState.err==="token"?"The teacher secret word does not match. Tell your teacher.":"Score saved here. It will be sent when the internet works."};
+ if(QUEUE.length)return {c:"wait",t:"Your score will be sent soon."};
+ return {c:"sent",t:"Your score was saved for your teacher."};
+}
+function paintSyncLines(){var s=syncLine();$$(".syncline").forEach(function(el){el.innerHTML='<i class="dot '+s.c+'"></i><span>'+esc(s.t)+'</span>'})}
+
+/* =====================================================================
+   SCREENS
+   ===================================================================== */
+var CUR=null,T0=0;
+function secs(){return Math.round((Date.now()-T0)/1000)}
+function coachHtml(){return '<div class="coach"><div class="kiki" id="kiki"></div><div class="bubble" id="bubble" role="status" aria-live="polite"></div></div>'}
+
+function showWelcome(){
+ CUR=null;drawHeader();
+ var lv0=P?P.level:1;
+ $("#main").innerHTML='<div class="welcome"><div>'+coachHtml()+'<h1>Let us play and write!</h1><p class="intro" style="margin-top:8px">Play eight games about celebrations in Malaysia. Your scores are saved for your teacher.</p></div>'+
+ '<form class="card" id="pf" autocomplete="off"><h2 style="font-size:1.5em">Who is playing?</h2>'+
+ '<div class="field"><label for="pn">My name</label><input type="text" id="pn" maxlength="30" required value="'+esc(P?P.name:"")+'" placeholder="First name only"></div>'+
+ '<div class="field"><label for="pc">My class</label><input type="text" id="pc" maxlength="20" required value="'+esc(P?P.cls:"")+'" placeholder="Example: 4 Amanah"></div>'+
+ '<div class="field"><span style="font-weight:600">My star level</span><div class="lvls" role="group" aria-label="Star level">'+LVL.map(function(l){return '<button type="button" class="lvl" data-l="'+l.n+'" aria-pressed="'+(l.n===lv0)+'"><b>'+l.t+' <span class="stars" aria-hidden="true">'+stars(l.n)+'</span></b><small>'+l.d+'</small></button>'}).join("")+'</div></div>'+
+ '<div class="row" style="margin-top:16px"><button class="btn blue" type="submit">Start playing</button></div>'+
+ '<p class="notice">Use your first name or class number only. Your teacher can see your name, class and scores.</p></form></div>';
+ kiki("Hi! I am Kiki. Let us learn about celebrations!","cheer");
+ var lvl=lv0;
+ $$(".lvl").forEach(function(b){b.onclick=function(){lvl=+b.getAttribute("data-l");$$(".lvl").forEach(function(x){x.setAttribute("aria-pressed",x===b)});sfx("tap")}});
+ $("#pf").onsubmit=function(e){e.preventDefault();var n=$("#pn").value.trim(),c=$("#pc").value.trim();if(!n||!c)return;
+  P={name:n,cls:c,level:lvl};save("profile",P);sfx("ok");showMap()};
+}
+
+function showMap(){
+ CUR=null;drawHeader();window.scrollTo(0,0);
+ var done=GAMES.filter(function(g){return BEST[g.k]}).length;
+ $("#main").innerHTML=coachHtml()+'<div class="maphd"><div><h2>Pick a game, '+esc(P.name)+'!</h2><p class="intro" style="margin:4px 0 0">You are on '+LVL[P.level-1].t+' <span class="stars" aria-hidden="true">'+stars(P.level)+'</span>. Games finished: '+done+' of '+GAMES.length+'.</p></div></div>'+
+ '<div class="map">'+GAMES.map(function(g){var b=BEST[g.k];return '<button class="gcard" data-g="'+g.k+'"><span class="ic" style="background:'+g.col+'">'+GICON[g.k]+'</span><span class="tag">'+g.tag+'</span><h3>'+g.t+'</h3><span style="color:var(--muted);font-size:.92em">'+g.d+'</span><span class="best"><span class="stars" aria-label="'+(b?b.stars:0)+' of 3 stars">'+stars(b?b.stars:0)+'</span><span>'+(b?"Best: "+b.pts:"Not played")+'</span></span></button>'}).join("")+'</div>';
+ kiki(done===0?"Choose any game to start!":done===GAMES.length?"You played every game. Amazing!":"Nice! Which game next?",done===GAMES.length?"cheer":"happy");
+ $$(".gcard").forEach(function(b){b.onclick=function(){sfx("tap");openGame(b.getAttribute("data-g"))}});
+}
+
+function openGame(k){
+ CUR=k;T0=Date.now();window.scrollTo(0,0);
+ var g=gm(k);
+ $("#main").innerHTML='<div class="gtop"><button class="btn white" id="backBtn">&larr; Games</button><h2>'+g.t+'</h2></div>'+coachHtml()+'<div class="card stage" id="stage"></div>';
+ $("#backBtn").onclick=showMap;
+ kiki("Let us start!","happy");
+ ({memory:gMemory,baskets:gBaskets,hunt:gHunt,train:gTrain,spot:gSpot,balloon:gBalloon,spin:gSpin,write:gWrite})[k]($("#stage"));
+}
+
+function finish(k,o){
+ o.pts=clamp(Math.round(o.pts),10,100);o.seconds=secs();
+ var rec=recordScore(k,o),st=rec.stars,g=gm(k);
+ sfx("win");confetti();
+ var msg=st===3?"Excellent! Three stars!":st===2?"Good job! Try again for three stars.":"Nice try! Play again to get more stars.";
+ openDlg('<div style="text-align:center"><div class="kiki" style="width:110px;margin:0 auto" id="kk"></div><h2 id="dlgTitle">'+g.t+' finished!</h2><div class="big" aria-label="'+st+' of 3 stars">'+[1,2,3].map(function(n){return '<span class="'+(n<=st?"pop":"")+'" style="'+(n<=st?"animation-delay:"+(n*.2)+"s":"opacity:.35")+'">★</span>'}).join("")+'</div><p style="font-size:1.4em;font-family:var(--display);font-weight:600;margin-top:8px">'+o.pts+' points</p><p class="intro" style="margin-top:4px">'+msg+'</p><div class="sync syncline"></div></div>'+
+ '<div class="row" style="justify-content:center;margin-top:16px"><button class="btn green" id="againBtn">Play again</button><button class="btn white" id="mapBtn">Back to games</button></div>');
+ $("#kk").innerHTML=kikiSvg("cheer");paintSyncLines();
+ $("#againBtn").onclick=function(){closeDlg();openGame(k)};
+ $("#mapBtn").onclick=function(){closeDlg();showMap()};
+}
+
+/* ---------- dialog ---------- */
+var lastFocus=null;
+function openDlg(html){lastFocus=document.activeElement;$("#dlg").innerHTML=html;$("#ov").classList.add("on");var f=$("#dlg button,#dlg input");if(f)f.focus()}
+function closeDlg(){$("#ov").classList.remove("on");$("#dlg").innerHTML="";if(lastFocus&&lastFocus.focus)try{lastFocus.focus()}catch(e){}}
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&$("#ov").classList.contains("on"))closeDlg()});
+$("#ov").addEventListener("click",function(e){if(e.target===$("#ov"))closeDlg()});
+
+/* =====================================================================
+   GAMES
+   ===================================================================== */
+/* 1. Memory */
+function gMemory(ST){
+ var n=lv([3,4,5]),ids=shuffle(DATA.map(function(d,i){return i})).slice(0,n),cards=[];
+ ids.forEach(function(i){cards.push({k:i,t:"pic"});cards.push({k:i,t:"name"})});
+ var M={cards:shuffle(cards),open:[],matched:{},miss:0,lock:false};
+ ST.innerHTML='<p class="intro">Flip two cards. Match each picture to its celebration name.</p><div class="mem" id="mg"></div><div class="msg" id="mm" role="status"></div>';
+ function draw(){
+  $("#mg").innerHTML=M.cards.map(function(c,i){
+   var up=M.open.indexOf(i)>=0||M.matched[i],d=DATA[c.k];
+   if(!up)return '<button class="mcard" data-m="'+i+'" aria-label="Hidden card">?</button>';
+   var inner=c.t==="pic"?'<span class="pic" style="background:'+d.col+'">'+ICON[d.ic]+'</span>':esc(d.short);
+   return '<button class="mcard face'+(M.matched[i]?" match":"")+'" data-m="'+i+'" aria-label="'+(c.t==="pic"?"Picture of "+esc(d.short):esc(d.short))+'">'+inner+'</button>'}).join("");
+ }
+ draw();kiki("Flip two cards to find a match.","think");
+ $("#mg").addEventListener("click",function(e){
+  var b=e.target.closest("[data-m]");if(!b||M.lock)return;var i=+b.getAttribute("data-m");
+  if(M.matched[i]||M.open.indexOf(i)>=0)return;sfx("tap");
+  M.open.push(i);draw();
+  if(M.open.length===2){
+   var a=M.cards[M.open[0]],c=M.cards[M.open[1]];
+   if(a.k===c.k&&a.t!==c.t){M.matched[M.open[0]]=1;M.matched[M.open[1]]=1;M.open=[];draw();sfx("ok");kiki(pick(CHEER),"cheer");
+    if(Object.keys(M.matched).length===M.cards.length)setTimeout(function(){finish("memory",{pts:100-M.miss*10,mistakes:M.miss})},500)}
+   else{M.miss++;M.lock=true;sfx("no");kiki("Not a match. Remember where they are!","oops");setTimeout(function(){M.open=[];M.lock=false;draw()},SET.calm?1400:900)}
+  }
+ });
+}
+
+/* 2. Baskets */
+var ITEMS={raya:["ketupat","lemang","baju kurung","duit raya"],cny:["ang pao","yee sang","lion dance","mandarin oranges"],deep:["oil lamp","kolam","murukku","sari"],xmas:["Christmas tree","carols","presents","Santa hat"]};
+function gBaskets(ST){
+ var nb=lv([3,4,4]),per=lv([2,2,3]),ids=["raya","cny","deep","xmas"].slice(0,nb),items=[];
+ ids.forEach(function(id){shuffle(ITEMS[id]).slice(0,per).forEach(function(t){items.push({t:t,c:id})})});
+ var B={items:shuffle(items),sel:-1,placed:{},miss:0};
+ ST.innerHTML='<p class="intro">Tap a thing. Then tap the basket where it belongs.</p><div class="pool" id="bp"></div><div class="baskets" id="bb"></div><div class="msg" id="bm" role="status"></div>';
+ function draw(){
+  $("#bp").innerHTML=B.items.map(function(it,i){return B.placed[i]?"":'<button class="tile'+(B.sel===i?" sel":"")+'" data-i="'+i+'">'+esc(it.t)+'</button>'}).join("");
+  $("#bb").innerHTML=ids.map(function(id){var d=dById(id),inn=B.items.filter(function(it,i){return B.placed[i]&&it.c===id}).map(function(it){return '<i>'+esc(it.t)+'</i>'}).join("");
+   return '<button class="basket'+(B.sel>=0?" hot":"")+'" data-b="'+id+'" aria-label="'+esc(d.short)+' basket"><div class="hd"><span class="ic" style="background:'+d.col+'">'+ICON[d.ic]+'</span>'+esc(d.short)+'</div><div class="in">'+inn+'</div></button>'}).join("");
+ }
+ draw();kiki("What belongs to which celebration?","think");
+ $("#bp").addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(!b)return;sfx("tap");B.sel=+b.getAttribute("data-i");draw();$("#bm").className="msg";$("#bm").textContent="Now tap a basket."});
+ $("#bb").addEventListener("click",function(e){
+  var b=e.target.closest("[data-b]");if(!b)return;
+  if(B.sel<0){$("#bm").className="msg no";$("#bm").textContent="Tap a thing first.";return}
+  var it=B.items[B.sel];
+  if(it.c===b.getAttribute("data-b")){B.placed[B.sel]=1;B.sel=-1;sfx("ok");kiki(pick(CHEER),"cheer");$("#bm").className="msg ok";$("#bm").textContent="Yes! That belongs there.";draw();
+   if(Object.keys(B.placed).length===B.items.length)setTimeout(function(){finish("baskets",{pts:100-B.miss*10,mistakes:B.miss})},500)}
+  else{B.miss++;sfx("no");kiki(pick(TRY),"oops");$("#bm").className="msg no";$("#bm").textContent=P.level===1?"Not that basket. Look at the picture on each basket.":"Not that basket. Try another one."}
+ });
+}
+
+/* 3. Word hunt */
+var HW=[["LAMP","A small light that burns oil."],["GIFT","A present for someone."],["FEAST","A big special meal."],["FAMILY","Parents, grandparents and children."],["LANTERN","A red paper light for Chinese New Year."],["KETUPAT","Rice cooked in a woven palm-leaf case."],["CAROLS","Songs we sing at Christmas."],["KOLAM","A floor pattern for Deepavali."]];
+function gHunt(ST){
+ var N=9,cnt=lv([4,6,8]),dirs=P.level===3?[[0,1],[1,0],[1,1]]:[[0,1],[1,0]],words=HW.slice(0,cnt),g,ok=false;
+ for(var tries=0;tries<80&&!ok;tries++){
+  g=[];for(var r=0;r<N;r++){g.push([]);for(var c=0;c<N;c++)g[r].push("")}
+  ok=true;var sorted=words.slice().sort(function(a,b){return b[0].length-a[0].length});
+  for(var wi=0;wi<sorted.length&&ok;wi++){
+   var w=sorted[wi][0],placed=false;
+   for(var t=0;t<120&&!placed;t++){
+    var d=pick(dirs),r0=Math.floor(Math.random()*N),c0=Math.floor(Math.random()*N),r1=r0+d[0]*(w.length-1),c1=c0+d[1]*(w.length-1);
+    if(r1>=N||c1>=N)continue;
+    var fit=true;for(var k=0;k<w.length;k++){var ch=g[r0+d[0]*k][c0+d[1]*k];if(ch&&ch!==w[k]){fit=false;break}}
+    if(!fit)continue;for(var k2=0;k2<w.length;k2++)g[r0+d[0]*k2][c0+d[1]*k2]=w[k2];placed=true;
+   }
+   if(!placed)ok=false;
+  }
+ }
+ var L="ABCDEFGHIKLMNOPRSTUY";for(var r2=0;r2<N;r2++)for(var c2=0;c2<N;c2++)if(!g[r2][c2])g[r2][c2]=L.charAt(Math.floor(Math.random()*L.length));
+ var H={found:{},cells:{},s:null,miss:0},clue=P.level>1;
+ ST.innerHTML='<p class="intro">'+(P.level===1?"Tap the first letter, then the last letter. Words go across or down. The list shows the words.":P.level===2?"Tap the first letter, then the last letter. Words go across or down. Use the clues.":"Tap the first letter, then the last letter. Words go across, down or diagonally. Use the clues.")+'</p><div class="hunt"><div><div class="hgrid" id="hg"></div></div><div><h3 style="font-size:1.15em">Find these words</h3><ul class="hwords'+(clue?" clue":"")+'" id="hw"></ul></div></div><div class="msg" id="hm" role="status"></div>';
+ function draw(){
+  var h="";for(var r=0;r<N;r++)for(var c=0;c<N;c++){var key=r+"-"+c,cls="hc";if(H.cells[key])cls+=" found";if(H.s&&H.s[0]===r&&H.s[1]===c)cls+=" sel";h+='<button class="'+cls+'" data-r="'+r+'" data-c="'+c+'" aria-label="Letter '+g[r][c]+', row '+(r+1)+', column '+(c+1)+'">'+g[r][c]+'</button>'}
+  $("#hg").innerHTML=h;
+  $("#hw").innerHTML=words.map(function(w){var f=H.found[w[0]];return '<li class="'+(f?"f":"")+'">'+(clue?(f?esc(w[0])+": ":"")+esc(w[1]):esc(w[0]))+'</li>'}).join("");
+ }
+ draw();kiki("Look for the words. Tap the first and last letter.","think");
+ $("#hg").addEventListener("click",function(e){
+  var b=e.target.closest(".hc");if(!b)return;var r=+b.getAttribute("data-r"),c=+b.getAttribute("data-c");sfx("tap");
+  if(!H.s){H.s=[r,c];draw();return}
+  var r0=H.s[0],c0=H.s[1];H.s=null;if(r0===r&&c0===c){draw();return}
+  var dr=r-r0,dc=c-c0,len=Math.max(Math.abs(dr),Math.abs(dc));
+  if(!(dr===0||dc===0||Math.abs(dr)===Math.abs(dc))){H.miss++;sfx("no");$("#hm").className="msg no";$("#hm").textContent="Words go in a straight line. Try again.";kiki(pick(TRY),"oops");draw();return}
+  var sr=Math.sign(dr),sc=Math.sign(dc),str="",cells=[];
+  for(var i=0;i<=len;i++){var rr=r0+sr*i,cc=c0+sc*i;str+=g[rr][cc];cells.push(rr+"-"+cc)}
+  var rev=str.split("").reverse().join(""),hit=null;
+  words.forEach(function(w){if(!H.found[w[0]]&&(w[0]===str||w[0]===rev))hit=w[0]});
+  if(hit){H.found[hit]=1;cells.forEach(function(k){H.cells[k]=1});sfx("ok");kiki("You found "+hit+"!","cheer");$("#hm").className="msg ok";$("#hm").textContent="You found "+hit+"!";
+   if(Object.keys(H.found).length===words.length)setTimeout(function(){finish("hunt",{pts:100-H.miss*8,mistakes:H.miss})},500)}
+  else{H.miss++;sfx("no");kiki(pick(TRY),"oops");$("#hm").className="msg no";$("#hm").textContent="That is not one of the words. Try again."}
+  draw();
+ });
+}
+
+/* 4. Sentence train */
+var TRAIN_ALL=["First, we light oil lamps.","We wear red clothes on Chinese New Year.","Next, we decorate the Christmas tree.","Then, we eat ketupat and rendang.","I feel happy because it is a special day.","Finally, we watch the lion dance."];
+function gTrain(ST){
+ var T=TRAIN_ALL.slice(0,lv([4,5,6])).map(function(s){var n=s.split(" ").length,idx=[];for(var k=0;k<n;k++)idx.push(k);
+  var pool=shuffle(idx);if(pool.join()===idx.join())pool.push(pool.shift());
+  var ans=[];if(P.level===1){ans=[0];pool=pool.filter(function(x){return x!==0})}
+  return{s:s,ans:ans,pool:pool,res:"",ok:false}}),miss=0;
+ ST.innerHTML='<p class="intro">Tap the words in the right order to build each sentence. Tap a word in the train to take it back.</p><div id="tb"></div>';
+ function draw(){
+  $("#tb").innerHTML=T.map(function(st,i){var w=st.s.split(" ");
+   return '<div class="item" data-i="'+i+'"><div class="wag"><div class="zone" aria-label="Your sentence">'+st.ans.map(function(k,pos){return '<button class="tile'+(P.level===1&&pos===0?" lock":"")+'" data-a="'+k+'">'+esc(w[k])+'</button>'}).join("")+'</div></div><div class="pool">'+st.pool.map(function(k){return '<button class="tile" data-p="'+k+'">'+esc(w[k])+'</button>'}).join("")+'</div><div class="row" style="margin-top:10px"><button class="btn blue" data-chk>Check</button><button class="btn white" data-say="'+esc(st.s)+'">Hear it</button><span class="msg '+(st.ok?"ok":"no")+'" style="margin:0" role="status">'+esc(st.res)+'</span></div></div>'}).join("");
+ }
+ draw();kiki("Build the sentences. Remember the capital letter!","think");
+ $("#tb").addEventListener("click",function(e){
+  var it=e.target.closest(".item");if(!it)return;var i=+it.getAttribute("data-i"),st=T[i],t;
+  if(e.target.closest("[data-say]")){say(st.s);return}
+  if(st.ok)return;
+  if((t=e.target.closest("[data-p]"))){sfx("tap");var p=+t.getAttribute("data-p");st.pool.splice(st.pool.indexOf(p),1);st.ans.push(p);st.res="";draw()}
+  else if((t=e.target.closest("[data-a]"))){var k=+t.getAttribute("data-a");if(P.level===1&&st.ans.indexOf(k)===0)return;sfx("tap");st.ans.splice(st.ans.indexOf(k),1);st.pool.push(k);st.res="";draw()}
+  else if(e.target.closest("[data-chk]")){
+   var w=st.s.split(" "),got=st.ans.map(function(k){return w[k]}).join(" ");
+   if(got===st.s){st.ok=true;st.res="Super! That is correct.";sfx("ok");kiki(pick(CHEER),"cheer")}
+   else{miss++;st.ok=false;st.res=st.ans.length<w.length?"Use all the words. Then check again.":"Almost! Check the order and the capital letter.";sfx("no");kiki(pick(TRY),"oops")}
+   draw();if(T.every(function(x){return x.ok}))setTimeout(function(){finish("train",{pts:100-miss*10,mistakes:miss})},600);
+  }
+ });
+}
+
+/* 5. Mistake detective */
+var SPOT_ALL=[
+ {t:["we","eat","ketupat","on","Hari","Raya","."],e:0,fix:"We",kind:"a capital letter",why:"Every sentence starts with a capital letter."},
+ {t:["We","wears","new","clothes","."],e:1,fix:"wear",kind:"a verb",why:"After We, use the base verb: wear."},
+ {t:["My","favourite","celebration","is","deepavali","."],e:4,fix:"Deepavali",kind:"a capital letter",why:"Names of celebrations start with a capital letter."},
+ {t:["First","we","light","oil","lamps","."],e:0,fix:"First,",kind:"a comma",why:"Put a comma after First."},
+ {t:["We","celebrate","Christmas","on","25th","December","▢"],e:6,fix:".",kind:"a full stop",why:"A sentence needs a full stop at the end."},
+ {t:["Then,","we","eats","murukku","."],e:2,fix:"eat",kind:"a verb",why:"After we, use the base verb: eat."}
+];
+function gSpot(ST){
+ var SP=SPOT_ALL.slice(0,lv([4,5,6])).map(function(s){return{s:s,done:false,miss:0}}),miss=0;
+ ST.innerHTML='<p class="intro">Each sentence has one mistake. Tap the word or mark that is wrong.</p><div id="sb"></div>';
+ function draw(){
+  $("#sb").innerHTML=SP.map(function(x,i){return '<div class="item" data-i="'+i+'">'+(P.level===1&&!x.done?'<p style="color:var(--muted);font-size:.9em">Hint: the mistake is about '+x.s.kind+'.</p>':"")+'<div class="tok">'+x.s.t.map(function(w,k){var fixed=x.done&&k===x.s.e;return '<button class="tile'+(fixed?" fixd":"")+'" data-k="'+k+'"'+(x.done?" disabled":"")+'>'+esc(fixed?x.s.fix:w)+'</button>'}).join("")+'</div><div class="msg '+(x.done?"ok":"no")+'" style="margin-top:6px" role="status">'+(x.done?"Found it! "+esc(x.s.why):(x.miss?"Not that one. Read the sentence again.":""))+'</div></div>'}).join("");
+ }
+ draw();kiki("Be a detective! Find the mistakes.","think");
+ $("#sb").addEventListener("click",function(e){
+  var b=e.target.closest("[data-k]");if(!b)return;var it=b.closest(".item"),i=+it.getAttribute("data-i"),x=SP[i];
+  if(+b.getAttribute("data-k")===x.s.e){x.done=true;x.miss=0;sfx("ok");kiki(pick(CHEER),"cheer")}else{x.miss++;miss++;sfx("no");kiki(pick(TRY),"oops")}
+  draw();if(SP.every(function(s){return s.done}))setTimeout(function(){finish("spot",{pts:100-miss*10,mistakes:miss})},600);
+ });
+}
+
+/* 6. Balloon pop */
+var BQ=[
+ {q:"We ___ ketupat on Hari Raya.",a:"eat",w:["eats","eating","ate"]},
+ {q:"___, we wake up early. Next, we wear new clothes.",a:"First,",w:["Finally,","Last,","End,"]},
+ {q:"My favourite celebration is ___.",a:"Deepavali",w:["deepavali","DEEPAVALI"]},
+ {q:"We celebrate Christmas ___ 25th December.",a:"on",w:["in","at"]},
+ {q:"I feel ___ because my family is together.",a:"happy",w:["happily","happiness"]},
+ {q:"Finally, we ___ the lion dance.",a:"watch",w:["watches","watching"]},
+ {q:"We ___ new clothes at Hari Raya.",a:"wear",w:["wears","wearing"]}
+];
+function gBalloon(ST){
+ var rounds=shuffle(BQ).slice(0,lv([5,6,7])),i=0,miss=0,cols=["#ff5d5d","#2563eb","#7c5cf0","#2fbf71","#ff7eb6","#ffc933"];
+ ST.innerHTML='<div class="rounds" id="br" aria-hidden="true"></div><div class="qline" id="bq"></div><div class="balloons" id="bl"></div><div class="msg" id="bm" role="status"></div>';
+ function draw(){
+  $("#br").innerHTML=rounds.map(function(r,k){return '<i class="'+(k<i?"d":k===i?"c":"")+'"></i>'}).join("");
+  var r=rounds[i],opts=shuffle([r.a].concat(r.w.slice(0,lv([1,2,3])+0)));
+  if(P.level===1)opts=shuffle([r.a].concat(r.w.slice(0,2)));
+  $("#bq").innerHTML=esc(r.q).replace("___",'<span class="blank">&nbsp;&nbsp;&nbsp;</span>');
+  $("#bl").innerHTML=opts.map(function(o,k){var c=cols[(k+i)%cols.length];return '<button class="bal'+(c==="#ffc933"?" dark":"")+'" style="background:'+c+'" data-w="'+esc(o)+'">'+esc(o)+'</button>'}).join("");
+  $("#bm").textContent="";
+ }
+ draw();kiki("Pop the balloon with the right word!","think");
+ $("#bl").addEventListener("click",function(e){
+  var b=e.target.closest("[data-w]");if(!b||b.classList.contains("gone"))return;var r=rounds[i];
+  if(b.getAttribute("data-w")===r.a){sfx("ok");b.classList.add("gone");$("#bq").innerHTML=esc(r.q).replace("___",'<span class="blank">'+esc(r.a)+"</span>");kiki(pick(CHEER),"cheer");
+   $$(".bal").forEach(function(x){x.disabled=true});i++;
+   setTimeout(function(){if(i>=rounds.length)finish("balloon",{pts:100-miss*10,mistakes:miss});else draw()},SET.calm?900:800)}
+  else{miss++;sfx("no");b.classList.add("shake");b.disabled=true;kiki(pick(TRY),"oops");$("#bm").className="msg no";$("#bm").textContent="Not that word. Try another balloon."}
+ });
+}
+
+/* 7. Story spinner */
+var ORD=["First,","Next,","Then,","After that,","Finally,"],FEEL=["happy","excited","proud","thankful","cheerful","joyful"];
+function modelSentence(d,o,f){
+ var core;if(o==="First,")core="we "+d.first+".";else if(o==="Next,")core="we wear "+d.wear+".";else if(o==="Then,"||o==="After that,")core="we eat "+d.eat+".";else core="we "+d.last+".";
+ return o+" "+core+" I feel "+f+" on "+d.short+".";
+}
+function gSpin(ST){
+ var R={n:0,cur:null,busy:false,spun:false,checked:false,pts:[],miss:0,texts:[]};
+ ST.innerHTML='<p class="intro">Spin to get a celebration, an order word and a feeling. Say a sentence aloud to a friend. Then type it. Do 3 rounds.</p><div class="rounds" id="sr" aria-hidden="true"></div><div class="reels"><div class="reel"><span class="l">Celebration</span><span class="ico" id="rIc"></span><span class="v" id="rCel">?</span></div><div class="reel"><span class="l">Order word</span><span class="v" id="rOrd">?</span></div><div class="reel"><span class="l">I feel</span><span class="v" id="rFeel">?</span></div></div><div class="row"><button class="btn" id="spinBtn">Spin</button><button class="btn white" id="modelBtn" disabled>Show a model</button></div><div class="msg" id="sm" role="status"></div><div class="field" style="margin-top:6px"><label for="si">My sentence</label><input type="text" id="si" autocomplete="off" disabled placeholder="Spin first, then write your sentence"></div><div class="row" style="margin-top:12px"><button class="btn blue" id="chkBtn" disabled>Check my sentence</button><button class="btn green" id="nextBtn" disabled>Next round</button></div><ul class="checks" id="ck" aria-live="polite"></ul>';
+ function rounds(){$("#sr").innerHTML=[0,1,2].map(function(k){return '<i style="display:inline-block;width:16px;height:16px;border-radius:50%;border:3px solid #1f2a44;margin-right:6px;background:'+(k<R.n?"#2fbf71":k===R.n?"#ffc933":"#fff")+'"></i>'}).join("")}
+ function show(c,o,f){var d=DATA[c];$("#rCel").textContent=d.short;$("#rIc").style.background=d.col;$("#rIc").innerHTML=ICON[d.ic];$("#rOrd").textContent=o;$("#rFeel").textContent=f}
+ rounds();kiki("Press Spin to start!","happy");
+ $("#spinBtn").onclick=function(){
+  if(R.busy)return;R.busy=true;R.checked=false;$("#spinBtn").disabled=true;$("#ck").innerHTML="";$("#sm").textContent="";$("#si").value="";$("#nextBtn").disabled=true;$("#chkBtn").disabled=true;
+  var n=SET.calm?1:12,c=0;
+  (function tick(){var ci=Math.floor(Math.random()*DATA.length),o=pick(ORD),f=pick(FEEL);show(ci,o,f);sfx("tap");
+   if(++c<n)setTimeout(tick,85);
+   else{R.cur={c:ci,o:o,f:f};R.busy=false;$("#spinBtn").disabled=false;$("#modelBtn").disabled=false;$("#si").disabled=false;$("#chkBtn").disabled=false;$("#si").focus();kiki("Say it aloud, then type your sentence.","happy")}
+  })();
+ };
+ $("#modelBtn").onclick=function(){if(!R.cur)return;var t=modelSentence(DATA[R.cur.c],R.cur.o,R.cur.f);$("#sm").className="msg";$("#sm").textContent="Model: "+t;say(t)};
+ $("#chkBtn").onclick=function(){
+  if(!R.cur||R.checked)return;var t=$("#si").value.trim(),d=DATA[R.cur.c],low=t.toLowerCase();
+  var list=[[/^[A-Z]/.test(t),"Starts with a capital letter"],[low.indexOf(R.cur.o.replace(",","").toLowerCase())===0||low.indexOf(R.cur.o.toLowerCase())>=0,"Uses the order word "+R.cur.o.replace(",","")],[/[.!?]$/.test(t),"Ends with a full stop"],[low.indexOf(d.short.toLowerCase())>=0||low.indexOf(R.cur.f)>=0,"Uses the celebration or the feeling"]];
+  var ok=list.filter(function(x){return x[0]}).length;
+  $("#ck").innerHTML=list.map(function(x){return '<li class="'+(x[0]?"ok":"")+'">'+esc(x[1])+'</li>'}).join("");
+  R.checked=true;R.pts.push(ok/4*100);R.miss+=4-ok;R.texts.push(t);
+  $("#chkBtn").disabled=true;$("#nextBtn").disabled=false;$("#nextBtn").textContent=R.n===2?"Finish":"Next round";
+  if(ok===4){sfx("ok");kiki(pick(CHEER),"cheer")}else{sfx("no");kiki("Good try! See what you can improve.","oops")}
+ };
+ $("#nextBtn").onclick=function(){
+  R.n++;if(R.n>=3){var avg=R.pts.reduce(function(a,b){return a+b},0)/R.pts.length;finish("spin",{pts:avg,mistakes:R.miss,text:R.texts.join(" | ")});return}
+  R.cur=null;rounds();$("#ck").innerHTML="";$("#si").value="";$("#si").disabled=true;$("#nextBtn").disabled=true;$("#modelBtn").disabled=true;$("#sm").textContent="";$("#rCel").textContent="?";$("#rOrd").textContent="?";$("#rFeel").textContent="?";$("#rIc").innerHTML="";$("#rIc").style.background="none";kiki("Round "+(R.n+1)+". Press Spin!","happy");
+ };
+}
+
+/* 8. Writing studio */
+function frame(n){
+ if(n===1)return "My favourite celebration is ____.\nWe celebrate it ____.\nFirst, we ____.\nNext, we wear ____.\nThen, we eat ____.\nFinally, we ____.\nI feel ____ because ____.";
+ if(n===2)return "My favourite celebration is \nWe celebrate it \nFirst, \nNext, \nThen, \nFinally, \nI feel ";
+ return "";
+}
+function sentences(t){return t.split(/(?<=[.!?])\s+|\n+/).map(function(s){return s.trim()}).filter(Boolean)}
+function uniqueOrder(t){var m=t.toLowerCase().match(/\b(first|next|then|after that|finally)\b/g)||[],u={};m.forEach(function(x){u[x]=1});return Object.keys(u).length}
+function capsOK(ss){return ss.length>0&&ss.every(function(s){var c=s.replace(/^[^A-Za-z]+/,"").charAt(0);return c&&c===c.toUpperCase()})}
+function stopsOK(ss){return ss.length>0&&ss.every(function(s){return /[.!?]$/.test(s)})}
+var FEELRE=/\b(happy|excited|joyful|proud|cheerful|thankful|glad|special|love)\b/i;
+function gWrite(ST){
+ var cel=0;
+ ST.innerHTML='<p class="intro">'+({1:"Star level 1: fill each blank. Tap words in the word bank to add them.",2:"Star level 2: finish each sentence starter. Add one more sentence if you can.",3:"Star level 3: write on your own. Use 4 order words and a because sentence."})[P.level]+'</p><div class="row"><label for="wc"><b>My celebration:</b></label><select id="wc" style="width:auto;max-width:100%">'+DATA.map(function(d,i){return '<option value="'+i+'">'+esc(d.name)+'</option>'}).join("")+'</select></div><div class="write" style="margin-top:14px"><div><label for="essay" class="sr">Write your paragraph here</label><textarea id="essay" spellcheck="true" autocomplete="off" placeholder="'+(P.level===3?"Start with: My favourite celebration is ...":"")+'"></textarea><div class="meter"><span id="wcnt">0 words</span><span id="scnt">0 sentences</span></div><div class="row" style="margin-top:12px"><button class="btn white" id="sayE">Read aloud</button><button class="btn white" id="clrE">Start again</button></div></div><div><div class="card" style="box-shadow:0 4px 0 var(--ink)"><h3>My checklist</h3><ul class="checks" id="ck" aria-live="polite"></ul></div><div class="card bank" style="margin-top:14px;box-shadow:0 4px 0 var(--ink)"><h3 style="margin:0;color:var(--ink);font-family:var(--display);font-size:1.2em">Word bank</h3><p style="font-size:.9em;color:var(--muted)">Tap a word to add it.</p><div id="bk"></div></div></div></div><div class="row" style="margin-top:16px"><button class="btn green" id="finBtn">Finish and save my score</button></div><div class="msg" id="wm" role="status"></div>';
+ var ta=$("#essay");ta.value=frame(P.level);
+ function bank(){var d=DATA[cel],gs=[["Celebration",DATA.map(function(x){return x.name})],["When",[d.when]],["Wear",[d.wear]],["Eat",[d.eat]],["Do",[d.first,d.last]],["Feelings",[d.feel,"happy","excited","proud","thankful"]],["Order words",ORD]],seen={};
+  $("#bk").innerHTML=gs.map(function(x){return '<h3>'+x[0]+'</h3><div class="bs">'+x[1].filter(function(w){if(x[0]==="Feelings"){if(seen[w])return false;seen[w]=1}return true}).map(function(w){return '<button data-w="'+esc(w)+'">'+esc(w)+'</button>'}).join("")+'</div>'}).join("")}
+ function items(){
+  var t=ta.value,ss=sentences(t),target=[5,6,8][P.level-1],need=P.level===3?4:3;
+  var list=[[ss.length>=target,"I wrote at least "+target+" sentences."],[capsOK(ss),"Every sentence starts with a capital letter."],[stopsOK(ss),"Every sentence ends with a full stop."],[uniqueOrder(t)>=need,"I used "+need+" different order words."],[FEELRE.test(t),"I said how I feel."]];
+  if(P.level===1)list.push([t.indexOf("____")<0&&t.trim().length>0,"I filled in every blank."]);
+  if(P.level===3)list.push([/\bbecause\b/i.test(t),"I wrote a sentence with because."]);
+  return list;
+ }
+ function check(){
+  var t=ta.value,ss=sentences(t),words=(t.match(/[A-Za-z']+/g)||[]).length,list=items();
+  $("#wcnt").textContent=words+(words===1?" word":" words");$("#scnt").textContent=ss.length+(ss.length===1?" sentence":" sentences");
+  $("#ck").innerHTML=list.map(function(c){return '<li class="'+(c[0]?"ok":"")+'">'+esc(c[1])+'<span class="sr">'+(c[0]?" Done.":" Not yet.")+'</span></li>'}).join("");
+ }
+ check();bank();kiki("Write about your favourite celebration!","happy");
+ ta.addEventListener("input",check);
+ $("#wc").onchange=function(){cel=+this.value;bank()};
+ $("#bk").addEventListener("click",function(e){
+  var b=e.target.closest("[data-w]");if(!b)return;sfx("tap");
+  var w=b.getAttribute("data-w"),v=ta.value,pos=ta.selectionStart==null?v.length:ta.selectionStart,i=v.indexOf("____",pos);if(i<0)i=v.indexOf("____");
+  if(i>=0){ta.value=v.slice(0,i)+w+v.slice(i+4);pos=i+w.length}
+  else{var pre=v.slice(0,pos),sp=(pre&&!/\s$/.test(pre))?" ":"";ta.value=pre+sp+w+" "+v.slice(pos);pos=pre.length+sp.length+w.length+1}
+  ta.focus();try{ta.setSelectionRange(pos,pos)}catch(x){}check();
+ });
+ $("#sayE").onclick=function(){say(ta.value.replace(/_+/g,"blank"))};
+ $("#clrE").onclick=function(){ta.value=frame(P.level);check();ta.focus()};
+ $("#finBtn").onclick=function(){
+  var t=ta.value.trim(),ss=sentences(t);
+  if(ss.length<2){$("#wm").className="msg no";$("#wm").textContent="Write at least 2 sentences first.";kiki("Write a little more first.","oops");return}
+  var list=items(),ok=list.filter(function(c){return c[0]}).length;
+  finish("write",{pts:ok/list.length*100,mistakes:list.length-ok,text:t});
+ };
+}
+
+/* =====================================================================
+   SETTINGS + TEACHER PANEL
+   ===================================================================== */
+function settingsHtml(){
+ return '<div class="row" style="justify-content:space-between"><h2 id="dlgTitle">Settings</h2><button class="btn white" id="xBtn">Close</button></div>'+
+ '<div class="setrow"><span>Sound</span><button class="btn white" id="sSound" aria-pressed="'+!!SET.sound+'">'+(SET.sound?"On":"Off")+'</button></div>'+
+ '<div class="setrow"><span>Text size</span><span class="row"><button class="btn white" id="sMin" aria-label="Smaller text">A&minus;</button><button class="btn white" id="sPlus" aria-label="Larger text">A+</button></span></div>'+
+ '<div class="setrow"><span>Easy-read font</span><button class="btn white" id="sEasy">'+(SET.easy?"On":"Off")+'</button></div>'+
+ '<div class="setrow"><span>Calm mode (less movement)</span><button class="btn white" id="sCalm">'+(SET.calm?"On":"Off")+'</button></div>'+
+ '<div class="setrow"><span>Player: <b>'+esc(P?P.name:"")+'</b></span><button class="btn white" id="sPlayer">Change player</button></div>'+
+ '<div class="setrow"><span>For teachers</span><button class="btn blue" id="sTeacher">Open</button></div>';
+}
+function bindSettings(){
+ $("#xBtn").onclick=closeDlg;
+ function re(){openDlg(settingsHtml());bindSettings()}
+ $("#sSound").onclick=function(){SET.sound=!SET.sound;save("settings",SET);re()};
+ $("#sMin").onclick=function(){SET.scale=clamp(+(SET.scale-.1).toFixed(2),.9,1.5);save("settings",SET);applySettings()};
+ $("#sPlus").onclick=function(){SET.scale=clamp(+(SET.scale+.1).toFixed(2),.9,1.5);save("settings",SET);applySettings()};
+ $("#sEasy").onclick=function(){SET.easy=!SET.easy;save("settings",SET);applySettings();re()};
+ $("#sCalm").onclick=function(){SET.calm=!SET.calm;save("settings",SET);applySettings();re()};
+ $("#sPlayer").onclick=function(){closeDlg();showWelcome()};
+ $("#sTeacher").onclick=function(){openTeacher()};
+}
+$("#gearBtn").onclick=function(){openDlg(settingsHtml());bindSettings()};
+
+function csv(){
+ var cols=["id","clientTime","student","cls","level","game","points","stars","mistakes","seconds","writing","device"];
+ function cell(v){v=String(v==null?"":v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'}
+ return [cols.join(",")].concat(HIST.map(function(r){return cols.map(function(c){return cell(r[c])}).join(",")})).join("\n");
+}
+function openTeacher(){
+ var url=sheetUrl(""),fromCode=!!CONFIG.SHEET_URL;
+ openDlg('<div class="row" style="justify-content:space-between"><h2 id="dlgTitle">For teachers</h2><button class="btn white" id="xBtn">Close</button></div>'+
+ '<p class="intro" style="margin-top:8px">Each finished game adds one row to your Google Sheet. If the internet is off, scores wait on this device and are sent later.</p>'+
+ '<div class="sync syncline" style="justify-content:flex-start"></div>'+
+ '<div class="tt"><b>Connection</b><br>'+(fromCode?'The Web app URL is set in the page code.':'Not set in the page code. You can paste it here to test it on this device, or put it in <code>CONFIG.SHEET_URL</code> so every pupil device uses it.')+
+ (fromCode?'':'<div class="field"><label for="tu">Web app URL (ends with /exec)</label><input type="text" id="tu" value="'+esc(SET.url||"https://script.google.com/macros/s/AKfycbxM8KEBISMYg3SSkUB7A9uiW5gmoX3DxtRWWWaDVHUCJBL0Io9IOeFpMNeupcJmQu66/exec")+'" placeholder="https://script.google.com/macros/s/.../exec"></div><div class="field"><label for="tk">Secret word (same as TOKEN in Code.gs)</label><input type="text" id="tk" value="'+esc(SET.token||"matcha25")+'" placeholder="change-me"></div>')+
+ '<div class="row" style="margin-top:12px"><button class="btn blue" id="tTest">Send test row</button><button class="btn white" id="tRetry">Send waiting scores ('+QUEUE.length+')</button></div><div class="msg" id="tMsg" role="status"></div></div>'+
+ '<div class="tt"><b>Scores on this device</b><br>'+HIST.length+' records saved. <div class="row" style="margin-top:10px"><button class="btn white" id="tCopy">Copy as CSV</button><button class="btn white" id="tDown">Download CSV</button><button class="btn white" id="tClear">Clear this device</button></div><div class="msg" id="tMsg2" role="status"></div></div>');
+ paintSyncLines();
+ $("#xBtn").onclick=closeDlg;
+ function saveInputs(){if(!fromCode){SET.url=($("#tu").value||"").trim();SET.token=($("#tk").value||"").trim();save("settings",SET)}}
+ $("#tTest").onclick=function(){
+  saveInputs();var m=$("#tMsg");
+  if(!sheetUrl()){m.className="msg no";m.textContent="Paste the Web app URL first.";return}
+  m.className="msg";m.textContent="Sending...";
+  var rec={id:newId(),student:"Test pupil",cls:"TEST",level:1,game:"TEST",points:0,stars:0,mistakes:0,seconds:0,writing:"Test from teacher panel",device:DEVICE,clientTime:new Date().toISOString()};
+  fetch(sheetUrl(),{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({token:sheetToken()},rec))}).then(function(r){return r.json()}).then(function(j){
+   if(j&&j.ok){m.className="msg ok";m.textContent="Connected. A TEST row was added to the Scores tab."}
+   else{m.className="msg no";m.textContent=j&&j.error==="token"?"The secret word does not match TOKEN in Code.gs.":"The script answered with an error: "+(j&&j.error)}
+  },function(){m.className="msg no";m.textContent="Could not read the reply. Check the URL ends with /exec and the Web app access is set to Anyone. Then look in your Sheet for a TEST row."});
+ };
+ $("#tRetry").onclick=function(){saveInputs();syncState.s="idle";flush();$("#tMsg").className="msg";$("#tMsg").textContent="Sending waiting scores..."};
+ $("#tCopy").onclick=function(){var m=$("#tMsg2");try{navigator.clipboard.writeText(csv()).then(function(){m.className="msg ok";m.textContent="Copied."},function(){m.className="msg no";m.textContent="Could not copy. Use Download CSV."})}catch(e){m.className="msg no";m.textContent="Could not copy. Use Download CSV."}};
+ $("#tDown").onclick=function(){try{var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv()],{type:"text/csv"}));a.download="celebration-writers-scores.csv";document.body.appendChild(a);a.click();a.remove()}catch(e){$("#tMsg2").textContent="Download is not available here. Use Copy as CSV."}};
+ $("#tClear").onclick=function(){if($("#tClear").getAttribute("data-sure")!=="1"){$("#tClear").setAttribute("data-sure","1");$("#tClear").textContent="Tap again to clear";return}
+  BEST={};HIST=[];QUEUE=[];P=null;save("best",BEST);save("hist",HIST);save("queue",QUEUE);try{localStorage.removeItem("cw_profile")}catch(e){}closeDlg();showWelcome()};
+}
+
+/* ---------- start ---------- */
+applySettings();
+if(P)showMap();else showWelcome();
+drawHeader();flush();
+})();
+</script>
+</body>
+</html>
